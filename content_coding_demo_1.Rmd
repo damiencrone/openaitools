@@ -5,7 +5,10 @@ title: "openaitools demo"
 
 ```{r}
 
-library(openaitools)
+if (!require(openaitools)) {
+  devtools::install_github("damiencrone/openaitools")
+  library(openaitools)
+}
 
 api_key = "sk-..." # Insert your API key here or load from file
 # To get an API key, go to https://platform.openai.com/api-keys

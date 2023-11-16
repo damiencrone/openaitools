@@ -5,8 +5,8 @@ title: "openaitools demo"
 
 ```{r}
 
-library(wikipediacorpus)
-library(openaitools)
+if(!require(wikipediacorpus)){devtools::install_github("damiencrone/wikipediacorpus"); library(wikipediacorpus)}
+if(!require(openaitools)){devtools::install_github("damiencrone/openaitools"); library(openaitools)}
 
 api_key = "sk-..." # Insert your API key here or load from file
 # To get an API key, go to https://platform.openai.com/api-keys
@@ -167,12 +167,12 @@ cat(system_prompt_template)
 
 ```{r}
 
-n = 5
+ind = which(consolidated_justification_table$name %in% c("Cost", "Deterrence", "Retribution"))
 dat = data.frame(text = c("The death penalty is a waste of money",
                           "Capital punishment is cheaper than alternatives",
                           "The death penalty will make people think twice before committing a crime",
                           "Capital punishment doesn't even work as a deterrent"))
-dat[, consolidated_justification_table$name[1:n]] = NA
+dat[, consolidated_justification_table$name[ind]] = NA
 print(dat)
 
 
@@ -182,7 +182,7 @@ print(dat)
 ```{r}
 
 for (i in 1:nrow(dat)) {
-  for (j in 1:n) {
+  for (j in ind) {
     code_name = consolidated_result_list[[j]]$name
     if (is.na(dat[i, code_name])) {
       input_list = list(TOPIC = "capital punishment",
