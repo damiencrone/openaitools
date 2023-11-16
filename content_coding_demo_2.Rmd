@@ -1,0 +1,207 @@
+---
+title: "openaitools demo"
+---
+
+
+```{r}
+
+library(wikipediacorpus)
+library(openaitools)
+
+api_key = "sk-..." # Insert your API key here or load from file
+# To get an API key, go to https://platform.openai.com/api-keys
+
+```
+
+```{r}
+
+result_list = list()
+article = get_wikipedia_article("Capital punishment debate in the United States")
+
+article_chunks = split_wikipedia_text(article)
+names(article_chunks)
+
+```
+
+```{r}
+
+cat(article_chunks["Cost"])
+
+```
+
+
+```{r}
+
+system_prompt_template = load_prompt("prompts/justification_identification_system_template.txt")
+
+```
+
+```{r}
+
+cat(system_prompt_template)
+
+```
+
+```{r}
+
+system_prompt = format_prompt(prompt_template = system_prompt_template,
+                              inputs = list(TOPIC = "capital punishment in general"))
+
+```
+
+
+```{r}
+
+cat(system_prompt)
+
+```
+
+
+```{r}
+
+for (section in names(article_chunks)) {
+  chunk = article_chunks[[section]]
+  if (!section %in% names(result_list)) {
+    prompt_list = list(list(role = "system", content = system_prompt),
+                       list(role = "user", content = chunk))
+    json_response = get_json_response(api_key, prompt_list)
+    result_list[[section]] = json_response
+  }
+}
+
+```
+
+```{r}
+
+print(result_list$Cost)
+
+```
+
+```{r}
+
+required_fields = c("name", "orientation", "explanation")
+
+justification_table = list()
+for (i in 1:length(article_chunks)) {
+  chunk_name = names(article_chunks)[i]
+  result = result_list[[i]]
+  jt = t(sapply(result, FUN = unlist))
+  if (ncol(jt) == length(required_fields) & all(required_fields == colnames(jt))) {
+    justification_table[[chunk_name]] = data.frame(
+      source = chunk_name,
+      jt
+    )
+  }
+}
+justification_table = do.call(rbind, args = justification_table)
+# View(justification_table)
+
+```
+
+```{r}
+
+flattened_result_list = list()
+for (result in result_list) {
+  flattened_result_list = c(flattened_result_list, result)
+}
+# Sort be name
+justification_names = sapply(flattened_result_list, function(x) x$name)
+ind = order(justification_names)
+flattened_result_list = flattened_result_list[ind]
+
+print(justification_names[ind])
+
+```
+
+```{r}
+
+system_prompt_template = load_prompt("prompts/justification_consolidation_system_template.txt")
+system_prompt = format_prompt(prompt_template = system_prompt_template,
+                              inputs = list(TOPIC = "capital punishment"))
+prompt_list = list(list(role = "system", content = system_prompt),
+                   list(role = "user", content = rjson::toJSON(flattened_result_list)))
+consolidated_result_list = get_json_response(api_key, prompt_list)
+consolidated_justification_table = data.frame(t(sapply(consolidated_result_list, FUN = unlist)))
+print(consolidated_justification_table$name)
+
+```
+
+```{r}
+
+system_prompt_template = load_prompt("prompts/justification_consolidation_system_template.txt")
+system_prompt = format_prompt(prompt_template = system_prompt_template,
+                              inputs = list(TOPIC = "capital punishment"))
+
+prompt_list = list(list(role = "system",
+                        content = system_prompt),
+                   list(role = "user",
+                        content = rjson::toJSON(consolidated_result_list)))
+
+cat(system_prompt)
+
+```
+
+
+
+```{r}
+
+consolidated_result_list = get_json_response(api_key, prompt_list)
+consolidated_justification_table = data.frame(t(sapply(consolidated_result_list, FUN = unlist)))
+print(consolidated_justification_table$name)
+
+```
+
+```{r}
+
+cat(paste(apply(consolidated_justification_table[1:5,], 1, paste, collapse = "\n"), collapse = "\n\n"))
+
+```
+
+```{r}
+
+
+system_prompt_template = load_prompt("prompts/justification_coding_system_template.txt")
+cat(system_prompt_template)
+
+```
+
+```{r}
+
+n = 5
+dat = data.frame(text = c("The death penalty is a waste of money",
+                          "Capital punishment is cheaper than alternatives",
+                          "The death penalty will make people think twice before committing a crime",
+                          "Capital punishment doesn't even work as a deterrent"))
+dat[, consolidated_justification_table$name[1:n]] = NA
+print(dat)
+
+
+```
+
+
+```{r}
+
+for (i in 1:nrow(dat)) {
+  for (j in 1:n) {
+    code_name = consolidated_result_list[[j]]$name
+    if (is.na(dat[i, code_name])) {
+      input_list = list(TOPIC = "capital punishment",
+                        JUSTIFICATION = rjson::toJSON(consolidated_result_list[[j]]))
+      system_prompt = format_prompt(prompt_template = system_prompt_template,
+                                    inputs = input_list)
+      prompt_list = list(list(role = "system",
+                              content = system_prompt),
+                         list(role = "user",
+                              content = dat$text[i]))
+      dat[i, code_name] = get_text_response(api_key, prompt_list)
+    }
+  }
+}
+
+result_table = dat[, -1]
+rownames(result_table) = dat[,1]
+colnames(result_table) = substr(colnames(result_table), 1, 5)
+print(result_table)
+
+```
+

@@ -1,0 +1,24 @@
+You will receive some text as input.
+Your job is to extract general justifications for and against <TOPIC>, ensuring all positions on the issue are well-represented.
+
+Respond with a JSON array with one element for each justification you identify, with elements formatted exactly as follows:
+
+'''json
+[
+{
+"name": "ABC", // This is a short string (no more than a few words) containing the name of the justification for or against <TOPIC> such that it could complete the sentence "My position on <TOPIC> is based on ABC"
+"orientation": "..", // This a string denoting which side of the issue the justification falls on from the perspective of a proponent of the justification; respond with one of the following: ["for", "against", "both"]
+"explanation": "..." // This is where you briefly explain the idea behind the justification (ignoring whether or not the justification is valid or well-founded)
+},
+{
+"name": "XYZ", 
+"orienttion": "...",
+"explanation": "..."
+}
+]
+'''
+
+Your responses must contain actual justifications for or against the issue.
+You explanations must not comment on the validity of the justification.
+If no justifications relating to <TOPIC> are present, return an empty JSON array ("[]").
+Respond only with the JSON array; do not include any other text in your response.

@@ -1,0 +1,27 @@
+You will receive a JSON array of justifications for and against <TOPIC> as input.
+
+Some of the justifications may be redundant with (i.e., not substantively different from) one another.
+
+Your job is to try and reduce the number of justifications in the array by merging highly similar justifications.
+
+If multiple justifications are specific instances of a more general justification, merge them into the more general justification, rewording content as required.
+
+Respond with a consolidated JSON array where similar justifications have been merged, with elements formatted exactly as follows:
+
+'''json
+[
+{
+"name": "ABC", // This is a string containing the name of the justification for or against <TOPIC> such that it could complete the sentence "My position on <TOPIC> is based on ABC"
+"orientation": "..", // This a string denoting which side of the issue the justification falls on from the perspective of a proponent of the justification; respond with one of the following: ["for", "against", "both"]
+"explanation": "..." // This is where you briefly explain the idea behind the justification (ignoring whether or not the justification is valid or well-founded)
+},
+{
+"name": "XYZ", 
+"orientation": "...",
+"explanation": "..."
+}
+]
+'''
+
+Do not add any new content.
+Respond only with the JSON array; do not include any other text in your response.

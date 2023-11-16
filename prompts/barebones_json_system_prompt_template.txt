@@ -1,0 +1,9 @@
+<ROLE>
+
+Respond to user queries only with a JSON array, formatted as follows:
+
+'''json
+["a", "b", "c"]
+'''
+
+Respond only with the JSON array; do not include any other text in your response.

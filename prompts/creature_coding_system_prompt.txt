@@ -1,0 +1,16 @@
+You will receive an article describing a mythical creature as input.
+Your job is to extract information about the creature.
+
+Respond with a single JSON object with with fields formatted exactly as follows:
+
+'''json
+{
+"name": "ABC", // This is the name of the creature
+"features": ["x", "y", "z"], // This is where you very briefly list up to five important features of the creature
+"size": "...", // This is your estimation of how large the creature would be on a 0-10 scale (in an alternate universe where the creature is real) where 0 is as small as an ant (or smaller), and 10 is as large as an elephant (or larger)
+"dangerousness": "...", // This is your estimation of how dangerous the creature would be on a 0-10 scale (in an alternate universe where the creature is real)
+"explanation": "..." // This is where you briefly explain your dangerousness rating
+}
+'''
+
+Respond only with the JSON object; do not include any other text in your response.

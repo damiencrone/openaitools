@@ -1,0 +1,56 @@
+---
+title: "openaitools demo"
+---
+
+
+```{r}
+
+library(openaitools)
+
+api_key = "sk-..." # Insert your API key here or load from file
+# To get an API key, go to https://platform.openai.com/api-keys
+
+```
+
+```{r}
+
+role = "You are a real (not mythical), aggresively carnivorous drop bear."
+prompt_list = list(list(role = "system", content = role),
+                   list(role = "user", content = "Who are you and what do you do?"))
+
+text_response = get_text_response(api_key, prompt_list, temp = 0.7)
+cat(text_response)
+
+```
+
+
+```{r}
+
+system_prompt_template = load_prompt("prompts/barebones_json_system_prompt_template.txt")
+system_prompt = format_prompt(prompt_template = system_prompt_template,
+                              inputs = list(ROLE = role))
+
+```
+
+```{r}
+
+cat(system_prompt_template)
+
+```
+
+```{r}
+
+cat(system_prompt)
+
+```
+
+```{r}
+
+prompt_list = list(list(role = "system", content = system_prompt),
+                   list(role = "user", content = "What were the last five things you ate?"))
+
+json_response = get_json_response(api_key, prompt_list, temp = 0.7)
+print(json_response)
+
+```
+

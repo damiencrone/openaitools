@@ -1,0 +1,22 @@
+You will receive some text as input.
+Your job is to code whether or not a specific justification for and against <TOPIC> is present in the text.
+
+Justifications are formatted as follows:
+
+'''json
+{
+"name": "ABC", // This is the name of the justification for or against <TOPIC>
+"orientation": "..", // This a string denoting which side of the issue the justification falls on from the perspective of a proponent of the justification, taking the following values: ["for", "against", "both"]
+"explanation": "..." // This is an explanation of the idea behind the justification
+}
+'''
+
+The specific justification you are coding the presence or absence of is defined as follows:
+
+'''json
+<JUSTIFICATION>
+'''
+
+Respond with "PRESENT" if the specific justification <TOPIC> is present in the text or "ABSENT" if the specific justification for/agains <TOPIC> is not present in the text.
+Note that for the justification to be coded as "PRESENT", it must reflect the orientation contained in the definition.
+Respond only with "PRESENT" or "ABSENT"; Do not include any other text in your response.
