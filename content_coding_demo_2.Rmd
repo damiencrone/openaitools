@@ -13,6 +13,8 @@ api_key = "sk-..." # Insert your API key here or load from file
 
 ```
 
+# Download article
+
 ```{r}
 
 result_list = list()
@@ -29,6 +31,7 @@ cat(article_chunks["Cost"])
 
 ```
 
+# Identify justifications
 
 ```{r}
 
@@ -77,6 +80,8 @@ print(result_list$Cost)
 
 ```
 
+## Wrangle results
+
 ```{r}
 
 required_fields = c("name", "orientation", "explanation")
@@ -112,6 +117,8 @@ flattened_result_list = flattened_result_list[ind]
 print(justification_names[ind])
 
 ```
+
+# Remove duplicates / reedundant justifications
 
 ```{r}
 
@@ -153,12 +160,15 @@ print(consolidated_justification_table$name)
 
 ```{r}
 
-cat(paste(apply(consolidated_justification_table[1:5,], 1, paste, collapse = "\n"), collapse = "\n\n"))
+# Print first five justifications
+jstr = apply(consolidated_justification_table[1:5,], 1, paste, collapse = "\n")
+cat(paste(jstr, collapse = "\n\n"))
 
 ```
 
-```{r}
+# Code new texts
 
+```{r}
 
 system_prompt_template = load_prompt("prompts/justification_coding_system_template.txt")
 cat(system_prompt_template)
@@ -167,14 +177,15 @@ cat(system_prompt_template)
 
 ```{r}
 
+texts = c("The death penalty is a waste of money",
+          "Capital punishment is cheaper than alternatives",
+          "The death penalty will make people think twice before committing a crime",
+          "Capital punishment doesn't even work as a deterrent")
+
 ind = which(consolidated_justification_table$name %in% c("Cost", "Deterrence", "Retribution"))
-dat = data.frame(text = c("The death penalty is a waste of money",
-                          "Capital punishment is cheaper than alternatives",
-                          "The death penalty will make people think twice before committing a crime",
-                          "Capital punishment doesn't even work as a deterrent"))
+dat = data.frame(text = texts)
 dat[, consolidated_justification_table$name[ind]] = NA
 print(dat)
-
 
 ```
 
@@ -185,8 +196,9 @@ for (i in 1:nrow(dat)) {
   for (j in ind) {
     code_name = consolidated_result_list[[j]]$name
     if (is.na(dat[i, code_name])) {
+      code_def = rjson::toJSON(consolidated_result_list[[j]])
       input_list = list(TOPIC = "capital punishment",
-                        JUSTIFICATION = rjson::toJSON(consolidated_result_list[[j]]))
+                        JUSTIFICATION = code_def)
       system_prompt = format_prompt(prompt_template = system_prompt_template,
                                     inputs = input_list)
       prompt_list = list(list(role = "system",

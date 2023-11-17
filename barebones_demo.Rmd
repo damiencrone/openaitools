@@ -10,22 +10,33 @@ if (!require(openaitools)) {
   library(openaitools)
 }
 
+model = "gpt-3.5-turbo-1106"
+
 api_key = "sk-..." # Insert your API key here or load from file
 # To get an API key, go to https://platform.openai.com/api-keys
 
 ```
 
+# Requesting text responses
+
 ```{r}
 
 role = "You are a real (not mythical), aggresively carnivorous drop bear."
-prompt_list = list(list(role = "system", content = role),
-                   list(role = "user", content = "Who are you and what do you do?"))
+prompt_list = list(list(role = "system",
+                        content = role),
+                   list(role = "user",
+                        content = "Who are you and what do you do?"))
 
-text_response = get_text_response(api_key, prompt_list, temp = 0.7)
+text_response = get_text_response(api_key = api_key,
+                                  prompt_list = prompt_list,
+                                  temp = 0.7,
+                                  model = model)
+
 cat(text_response)
 
 ```
 
+# Requesting JSON responses
 
 ```{r}
 
@@ -52,7 +63,7 @@ cat(system_prompt)
 prompt_list = list(list(role = "system", content = system_prompt),
                    list(role = "user", content = "What were the last five things you ate?"))
 
-json_response = get_json_response(api_key, prompt_list, temp = 0.7)
+json_response = get_json_response(api_key, prompt_list, temp = 0)
 print(json_response)
 
 ```

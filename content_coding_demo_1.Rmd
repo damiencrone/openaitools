@@ -2,7 +2,6 @@
 title: "openaitools demo"
 ---
 
-
 ```{r}
 
 if (!require(openaitools)) {
@@ -18,6 +17,7 @@ api_key = "sk-..." # Insert your API key here or load from file
 ```{r}
 
 articles = readRDS(file = "data/en_mythical_creatures_corpus_processed.RDS")
+# From https://en.wikipedia.org/wiki/Category:Australian_legendary_creatures
 result_list = list()
 
 cat(articles["Hoop snake"])
